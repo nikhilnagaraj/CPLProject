@@ -1,24 +1,43 @@
 package sless.ast
 
-case class RuleBase(selector: SelectorBase, decls: Seq[DeclarationBase])
+case class RuleBase(selector: SelectorBase, decls: Seq[DeclarationBase]) {
+  var comment: Option[CommentBase] = None
+}
 
 object RuleBase {
 
   def apply(selector: SelectorBase, decls: Seq[DeclarationBase]): RuleBase =
     new RuleBase(selector, decls)
 
+  def addComment(rule:RuleBase, thisComment: CommentBase): RuleBase = {
+    rule.comment = Some(thisComment)
+    return rule
+  }
+
   def getRuleString(rule: RuleBase) : String = {
     val selectorString: String = SelectorBase.getSelectorString(rule.selector)
     val declStrings: Seq[String] = Utility.map[DeclarationBase,String](DeclarationBase.getDeclarationString,rule.decls)
-
-    selectorString + "{" + declStrings.mkString("",";",";") + "}"
+    if(rule.comment.isDefined){
+      val commentString: String = CommentBase.getCommentString(rule.comment.get)
+      "/* " + commentString + " */" +  selectorString + "{" + declStrings.mkString("","","") + "}"
+    }
+    else{
+      selectorString + "{" + declStrings.mkString("","","") + "}"
+    }
   }
 
   def getRulePrettyString(rule: RuleBase, spaces: Int) : String = {
     val selectorString: String = SelectorBase.getSelectorPrettyString(rule.selector)
     val declStrings: Seq[String] = Utility.map[DeclarationBase,String](DeclarationBase.getDeclarationPrettyString,rule.decls)
+    if(rule.comment.isDefined){
+      val commentString: String = CommentBase.getCommentString(rule.comment.get)
+      "/* " + commentString + " */" + "\n" + selectorString + " {\n" + declStrings.mkString(" ".repeat(spaces),"\n" + " ".repeat(spaces),"\n") + "}"
+    }
+    else{
+      selectorString + " {\n" + declStrings.mkString(" ".repeat(spaces),"\n" + " ".repeat(spaces),"\n") + "}"
+    }
 
-    selectorString + " {\n" + declStrings.mkString(" ".repeat(spaces),";\n" + " ".repeat(spaces),";\n") + "}"
+
   }
 
   def isNotEmptyDeclaration(rule: RuleBase): Boolean = rule.decls.nonEmpty

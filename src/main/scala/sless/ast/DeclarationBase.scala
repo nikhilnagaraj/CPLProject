@@ -1,6 +1,8 @@
 package sless.ast
 
-case class DeclarationBase(prop: PropertyBase, value: ValueBase)
+case class DeclarationBase(prop: PropertyBase, value: ValueBase) {
+  var comment: Option[CommentBase] = None
+}
 
 object DeclarationBase{
 
@@ -8,11 +10,30 @@ object DeclarationBase{
     new DeclarationBase(prop,value)
   }
 
+  def addComment(decl: DeclarationBase,thisComment: CommentBase): DeclarationBase = {
+    decl.comment = Some(thisComment)
+    return decl
+  }
+
   def getDeclarationString(decl: DeclarationBase): String = {
-    PropertyBase.getPropString(decl.prop) + ":" + ValueBase.getValueString(decl.value)
+    if(decl.comment.isDefined){
+      PropertyBase.getPropString(decl.prop) + ":" + ValueBase.getValueString(decl.value) + ";" +
+        "/* " + CommentBase.getCommentString(decl.comment.get) + " */"
+    }
+    else{
+      PropertyBase.getPropString(decl.prop) + ":" + ValueBase.getValueString(decl.value) + ";"
+    }
+
   }
 
   def getDeclarationPrettyString(decl: DeclarationBase): String = {
-    PropertyBase.getPropString(decl.prop) + ": " + ValueBase.getValueString(decl.value)
+    if(decl.comment.isDefined){
+      PropertyBase.getPropString(decl.prop) + ": " + ValueBase.getValueString(decl.value) + "; " +
+        "/* " + CommentBase.getCommentString(decl.comment.get) + " */"
+    }
+    else{
+      PropertyBase.getPropString(decl.prop) + ": " + ValueBase.getValueString(decl.value) + ";"
+    }
   }
+
 }
