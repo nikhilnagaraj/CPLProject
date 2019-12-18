@@ -7,7 +7,7 @@ class CustomTest extends FunSuite {
   import CustomTestImplementation.dsl._
 
   //Tests psuedoClass selectors with string arguments
-  test("Simple CSS") {
+  test("Pseudoclass args") {
     val backgroundColor = prop("background-color")
     val container = tipe("div") |- tipe("container")
     val p = tipe("p")

@@ -1,5 +1,7 @@
 package sless.ast
 
+// Base rule class
+
 case class RuleBase(selector: SelectorBase, decls: Seq[DeclarationBase]) {
   var comment: Option[CommentBase] = None
 }
@@ -31,8 +33,6 @@ object RuleBase {
       modifiedDecls = rule.decls.filter(x => x.prop != decl.prop)
       modifiedDecls = modifiedDecls :+ decl
     }
-
-
     RuleBase(rule.selector, modifiedDecls)
   }
 
@@ -84,7 +84,6 @@ object RuleBase {
         case _ => None
       }
     }
-
     marginTop && marginBottom && marginLeft && marginRight
   }
 
@@ -118,7 +117,7 @@ object RuleBase {
     }
   }
 
-  def changeSelector(rule: RuleBase, newSelector: SelectorBase) = {
+  def changeSelector(rule: RuleBase, newSelector: SelectorBase): RuleBase = {
     RuleBase.addComment(RuleBase(newSelector, rule.decls), rule.comment)
   }
 }

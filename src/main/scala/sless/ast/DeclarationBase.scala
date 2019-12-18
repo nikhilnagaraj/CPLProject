@@ -1,5 +1,7 @@
 package sless.ast
 
+// Base declaration class
+
 case class DeclarationBase(prop: PropertyBase, value: ValueBase) {
   var comment: Option[CommentBase] = None
 }

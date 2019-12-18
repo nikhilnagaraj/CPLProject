@@ -1,5 +1,10 @@
 package sless.ast
 
+//The base selector class. Contains the selector and its pretty variant +  its and its children's extensions (if any)
+
+//A compound selector building upon the base class  and storing the relations between its constitutents
+// might be a better idea. For the extensions in the project, this works fine.
+
 case class SelectorBase(thisSelector: String, thisPrettySelector: String) {
   var extendSelector: Seq[(SelectorBase, SelectorBase)] = Seq[(SelectorBase, SelectorBase)]()
 }
