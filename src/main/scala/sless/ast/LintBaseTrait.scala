@@ -41,7 +41,7 @@ trait LintBaseTrait extends BaseImpl with LintDSL {
     var numFloats = 0
     for (rule <- css.rules) {
       for (decl <- rule.decls) {
-        if(PropertyBase.getPropString(decl.prop) == "float"){
+        if (decl.prop.thisProp == "float") {
           numFloats += 1
           if(numFloats > n){
             return true

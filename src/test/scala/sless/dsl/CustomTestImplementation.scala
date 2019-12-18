@@ -2,7 +2,7 @@ package sless.dsl
 
 import sless.ast.BaseObject
 
-object ExtendImplementation {
+object CustomTestImplementation {
   type DSL = PropertyDSL with SelectorDSL with ValueDSL with ExtendDSL with Compilable
   val dsl: DSL = BaseObject
 }

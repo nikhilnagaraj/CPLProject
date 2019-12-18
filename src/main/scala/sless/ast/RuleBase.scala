@@ -9,13 +9,40 @@ object RuleBase {
   def apply(selector: SelectorBase, decls: Seq[DeclarationBase]): RuleBase =
     new RuleBase(selector, decls)
 
-  def addComment(rule:RuleBase, thisComment: CommentBase): RuleBase = {
-    rule.comment = Some(thisComment)
-    return rule
+  def addDecl(rule: RuleBase, decl: DeclarationBase, option: String): RuleBase = {
+    /*
+      Option 'a' = Appends given declaration to the given rule, removes any declaration with same property in rule
+      Option 'o' = Overwrites declaration if similar property exists.
+     */
+    var modifiedBool = false
+    var modifiedDecls = Seq[DeclarationBase]()
+
+    if (option == "o") {
+      modifiedDecls = rule.decls.map(givenDecl =>
+        if (givenDecl.prop == decl.prop) {
+          modifiedBool = true
+          DeclarationBase.addComment(decl, givenDecl.comment)
+        } else givenDecl)
+
+      if (!modifiedBool) {
+        modifiedDecls = modifiedDecls :+ decl
+      }
+    } else {
+      modifiedDecls = rule.decls.filter(x => x.prop != decl.prop)
+      modifiedDecls = modifiedDecls :+ decl
+    }
+
+
+    RuleBase(rule.selector, modifiedDecls)
+  }
+
+  def addComment(rule: RuleBase, thisComment: Option[CommentBase]): RuleBase = {
+    rule.comment = thisComment
+    rule
   }
 
   def getRuleString(rule: RuleBase) : String = {
-    val selectorString: String = SelectorBase.getSelectorString(rule.selector)
+    val selectorString: String = rule.selector.thisSelector
     val declStrings: Seq[String] = Utility.map[DeclarationBase,String](DeclarationBase.getDeclarationString,rule.decls)
     if(rule.comment.isDefined){
       val commentString: String = CommentBase.getCommentString(rule.comment.get)
@@ -27,7 +54,7 @@ object RuleBase {
   }
 
   def getRulePrettyString(rule: RuleBase, spaces: Int) : String = {
-    val selectorString: String = SelectorBase.getSelectorPrettyString(rule.selector)
+    val selectorString: String = rule.selector.thisPrettySelector
     val declStrings: Seq[String] = Utility.map[DeclarationBase,String](DeclarationBase.getDeclarationPrettyString,rule.decls)
     if(rule.comment.isDefined){
       val commentString: String = CommentBase.getCommentString(rule.comment.get)
@@ -49,7 +76,7 @@ object RuleBase {
     var marginBottom: Boolean = false
 
     for (decl <- rule.decls) {
-      PropertyBase.getPropString(decl.prop) match {
+      decl.prop.thisProp match {
         case "margin-top" => marginTop = true
         case "margin-left" => marginLeft = true
         case "margin-bottom" => marginBottom = true
@@ -69,11 +96,11 @@ object RuleBase {
     var marginRight: Option[(Int, String)] = None
 
     for (decl <- rule.decls) {
-      PropertyBase.getPropString(decl.prop) match {
-        case "margin-top" => marginTop = Some((declIx, ValueBase.getValueString(decl.value)))
-        case "margin-left" => marginLeft = Some((declIx, ValueBase.getValueString(decl.value)))
-        case "margin-bottom" => marginBottom = Some((declIx, ValueBase.getValueString(decl.value)))
-        case "margin-right" => marginRight = Some((declIx, ValueBase.getValueString(decl.value)))
+      decl.prop.thisProp match {
+        case "margin-top" => marginTop = Some((declIx, decl.value.thisValue))
+        case "margin-left" => marginLeft = Some((declIx, decl.value.thisValue))
+        case "margin-bottom" => marginBottom = Some((declIx, decl.value.thisValue))
+        case "margin-right" => marginRight = Some((declIx, decl.value.thisValue))
         case _ => None
       }
       declIx += 1
@@ -82,12 +109,16 @@ object RuleBase {
       val firstMargin = marginTop.get._1 min marginLeft.get._1 min marginRight.get._1 min marginBottom.get._1
       val newValue = marginTop.get._2 + " " + marginRight.get._2 + " " + marginBottom.get._2 + " " + marginLeft.get._2
       val newDecl = DeclarationBase(PropertyBase("margin"),ValueBase(newValue))
-      val updatedDecls = rule.decls.updated(firstMargin, newDecl).filter(decl => !PropertyBase.getPropString(decl.prop).startsWith("margin-"))
+      val updatedDecls = rule.decls.updated(firstMargin, newDecl).filter(decl => !decl.prop.thisProp.startsWith("margin-"))
 
       RuleBase(rule.selector, updatedDecls)
     }
     else {
       rule
     }
+  }
+
+  def changeSelector(rule: RuleBase, newSelector: SelectorBase) = {
+    RuleBase.addComment(RuleBase(newSelector, rule.decls), rule.comment)
   }
 }

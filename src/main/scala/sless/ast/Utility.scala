@@ -8,4 +8,8 @@ object Utility {
     } yield f(x)
   }
 
+  def deleteAtIndex[A](x: Seq[A], ix: Int): Seq[A] = {
+    x.take(ix) ++ x.drop(ix + 1)
+  }
+
 }

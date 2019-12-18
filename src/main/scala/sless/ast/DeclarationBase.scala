@@ -10,30 +10,31 @@ object DeclarationBase{
     new DeclarationBase(prop,value)
   }
 
-  def addComment(decl: DeclarationBase,thisComment: CommentBase): DeclarationBase = {
-    decl.comment = Some(thisComment)
+  def addComment(decl: DeclarationBase, thisComment: Option[CommentBase]): DeclarationBase = {
+    decl.comment = thisComment
     return decl
   }
 
   def getDeclarationString(decl: DeclarationBase): String = {
     if(decl.comment.isDefined){
-      PropertyBase.getPropString(decl.prop) + ":" + ValueBase.getValueString(decl.value) + ";" +
+      decl.prop.thisProp + ":" + decl.value.thisValue + ";" +
         "/* " + CommentBase.getCommentString(decl.comment.get) + " */"
     }
     else{
-      PropertyBase.getPropString(decl.prop) + ":" + ValueBase.getValueString(decl.value) + ";"
+      decl.prop.thisProp + ":" + decl.value.thisValue + ";"
     }
 
   }
 
   def getDeclarationPrettyString(decl: DeclarationBase): String = {
     if(decl.comment.isDefined){
-      PropertyBase.getPropString(decl.prop) + ": " + ValueBase.getValueString(decl.value) + "; " +
+      decl.prop.thisProp + ": " + decl.value.thisValue + "; " +
         "/* " + CommentBase.getCommentString(decl.comment.get) + " */"
     }
     else{
-      PropertyBase.getPropString(decl.prop) + ": " + ValueBase.getValueString(decl.value) + ";"
+      decl.prop.thisProp + ": " + decl.value.thisValue + ";"
     }
   }
+
 
 }

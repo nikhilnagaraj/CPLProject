@@ -9,7 +9,12 @@ trait SelectorDSL extends BaseDSL {
   protected def id(s: Selector, string: String): Selector
   protected def attribute(s: Selector, attr: String, value: Value): Selector
 
+  //The given pseudoclass selector and modifications to support PseudoClass selectors with String/Selector arguments
+  //pseudo - Pseudoclass selector chosen, arg - argument to said selector
   protected def pseudoClass(s: Selector, string: String): Selector
+
+  protected def pseudoClass(s: Selector, pseudo: String, arg: String): Selector
+
   protected def pseudoElement(s: Selector, string: String): Selector
 
   // combinators
@@ -41,12 +46,21 @@ trait SelectorDSL extends BaseDSL {
     def at(attr: String, value: Value): Selector = attribute(s, attr, value)
 
     def :|(pseudo: String): Selector = pseudoClass(s, pseudo)
+
+    def :|(pseudo: String, arg: String): Selector = pseudoClass(s, pseudo, arg)
     def ::(pseudoEl: String): Selector = pseudoElement(s, pseudoEl)
 
     def |~(selector: Selector): Selector = adjacent(s, selector)
     def |+(selector: Selector): Selector = general(s, selector)
     def |>(selector: Selector): Selector = child(s, selector)
     def |-(selector: Selector): Selector = descendant(s, selector)
+
+    //Shorthand to invoke custom Pseudoclass selectors
+    def nc(arg: String): Selector = s :| ("nth-child", arg) //nth-child
+    def lang(arg: String): Selector = s :| ("lang", arg) //lang
+    def nlc(arg: String): Selector = s :| ("nth-last-child", arg) //nth-last-child
+    def nt(arg: String): Selector = s :| ("nth-of-type", arg) //nth-of-type
+    def nlt(arg: String): Selector = s :| ("nth-last-of-type", arg) //nth-last-of-type
 
     def apply(declarations: Declaration*): Rule = bindTo(s, declarations.toSeq)
   }
